@@ -336,35 +336,43 @@ public class SymfonyServerCodegen extends AbstractPhpCodegen implements CodegenC
             for (CodegenParameter param : op.allParams) {
                 // Determine if the parameter type is supported as a type hint and make it available
                 // to the templating engine
-                String typeHint = getTypeHint(param.dataType);
+                String dataType = param.dataType;
+                String typeHint = getTypeHint(dataType);
                 if (!typeHint.isEmpty()) {
                     param.vendorExtensions.put("x-parameterType", typeHint);
                 }
 
                 if (param.isContainer) {
-                    param.vendorExtensions.put("x-parameterType", getTypeHint(param.dataType+"[]"));
+                    param.vendorExtensions.put("x-parameterType", getTypeHint(dataType +"[]"));
                 }
 
                 // Create a variable to display the correct data type in comments for interfaces
-                param.vendorExtensions.put("x-commentType", param.dataType);
+                if (isModelClass(dataType)) {
+                    dataType = extractSimpleName(dataType);
+                }
+                param.vendorExtensions.put("x-commentType", dataType);
                 if (param.isContainer) {
-                    param.vendorExtensions.put("x-commentType", param.dataType+"[]");
+                    param.vendorExtensions.put("x-commentType", extractSimpleName(dataType)+"[]");
                 }
 
                 // Quote default values for strings
                 // @todo: The default values for headers, forms and query params are handled
                 //        in DefaultCodegen fromParameter with no real possibility to override
                 //        the functionality. Thus we are handling quoting of string values here
-                if (param.dataType.equals("string") && param.defaultValue != null && !param.defaultValue.isEmpty()) {
+                if (dataType.equals("string") && param.defaultValue != null && !param.defaultValue.isEmpty()) {
                     param.defaultValue = "'"+param.defaultValue+"'";
                 }
             }
 
             // Create a variable to display the correct return type in comments for interfaces
             if (op.returnType != null) {
-                op.vendorExtensions.put("x-commentType", op.returnType);
-                if (!op.returnTypeIsPrimitive) {
-                    op.vendorExtensions.put("x-commentType", op.returnType+"[]");
+                String returnType = op.returnType;
+                if (isModelClass(returnType)) {
+                    returnType = extractSimpleName(returnType);
+                }
+                op.vendorExtensions.put("x-commentType", returnType);
+                if (op.isListContainer) {
+                    op.vendorExtensions.put("x-commentType", returnType+"[]");
                 }
             } else {
                 op.vendorExtensions.put("x-commentType", "void");
@@ -397,12 +405,15 @@ public class SymfonyServerCodegen extends AbstractPhpCodegen implements CodegenC
                 String typeHint = getTypeHint(var.datatype);
                 if (!typeHint.isEmpty()) {
                     var.vendorExtensions.put("x-parameterType", typeHint);
+                    if (var.isContainer) {
+                        var.vendorExtensions.put("x-parameterType", getTypeHint(var.datatype+"[]"));
+                    }
                 }
 
                 // Create a variable to display the correct data type in comments for models
-                var.vendorExtensions.put("x-commentType", var.datatype);
+                var.vendorExtensions.put("x-commentType", extractSimpleName(var.datatype));
                 if (var.isContainer) {
-                    var.vendorExtensions.put("x-commentType", var.datatype+"[]");
+                    var.vendorExtensions.put("x-commentType", extractSimpleName(var.datatype)+"[]");
                 }
 
                 if (var.isBoolean) {
