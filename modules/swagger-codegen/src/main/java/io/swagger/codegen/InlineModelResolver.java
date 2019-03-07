@@ -1,5 +1,6 @@
 package io.swagger.codegen;
 
+import io.swagger.codegen.languages.SwaggerGenerator;
 import io.swagger.models.*;
 import io.swagger.models.parameters.BodyParameter;
 import io.swagger.models.parameters.Parameter;
@@ -15,14 +16,24 @@ import java.util.Map;
 
 public class InlineModelResolver {
     private Swagger swagger;
+    private CodegenConfig config;
     private boolean skipMatches;
     static Logger LOGGER = LoggerFactory.getLogger(InlineModelResolver.class);
 
     Map<String, Model> addedModels = new HashMap<String, Model>();
     Map<String, String> generatedSignature = new HashMap<String, String>();
 
+    /**
+     * Preserve legacy API for tests.
+     * @param swagger
+     */
     public void flatten(Swagger swagger) {
+        flatten(swagger, new SwaggerGenerator());
+    }
+
+    public void flatten(Swagger swagger, CodegenConfig config) {
         this.swagger = swagger;
+        this.config = config;
 
         if (swagger.getDefinitions() == null) {
             swagger.setDefinitions(new HashMap<String, Model>());
@@ -228,9 +239,9 @@ public class InlineModelResolver {
 
     private String resolveModelName(String title, String key) {
         if (title == null) {
-            return uniqueName(key);
+            return uniqueName(config.toModelName(key));
         } else {
-            return uniqueName(title);
+            return uniqueName(config.toModelName(title));
         }
     }
 

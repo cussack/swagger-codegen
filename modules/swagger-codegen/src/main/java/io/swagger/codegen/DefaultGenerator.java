@@ -743,7 +743,7 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
 
         // resolve inline models
         InlineModelResolver inlineModelResolver = new InlineModelResolver();
-        inlineModelResolver.flatten(swagger);
+        inlineModelResolver.flatten(swagger, config);
 
         List<File> files = new ArrayList<File>();
         // models
