@@ -23,7 +23,10 @@
 {{#isContainer}}
      * @Assert\All({
     {{#items}}
-     *   @Assert\Type("{{datatype}}")
+     *   @Assert\Type("{{datatype}}"),
+     {{^isPrimitiveType}}
+     *   @Assert\Valid(),
+     {{/isPrimitiveType}}
     {{/items}}
      * })
      {{#items}}

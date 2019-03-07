@@ -21,6 +21,7 @@
             new Assert\Type("{{datatype}}")
         ]);
     {{/items}}
+        $asserts[] = new Assert\Valid({{^isPrimitiveType}}["traverse" => true]{{/isPrimitiveType}});
 {{/isContainer}}
 {{^isContainer}}
     {{#isDate}}
@@ -36,6 +37,9 @@
     {{/isFile}}
     {{^isFile}}
         $asserts[] = new Assert\Type("{{dataType}}");
+    {{^isPrimitiveType}}
+        $asserts[] = new Assert\Valid();
+    {{/isPrimitiveType}}
     {{/isFile}}
     {{/isDateTime}}
     {{/isDate}}

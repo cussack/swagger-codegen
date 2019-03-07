@@ -2,15 +2,15 @@
 
 namespace {{servicePackage}};
 
-use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\ValidatorBuilderInterface;
 
 class SymfonyValidator implements ValidatorInterface
 {
     protected $validator;
 
-    public function __construct()
+    public function __construct(ValidatorBuilderInterface $validatorBuilder)
     {
-        $this->validator = Validation::createValidator();
+        $this->validator = $validatorBuilder->enableAnnotationMapping()->getValidator();
     }
 
     public function validate($value, $constraints = null, $groups = null)

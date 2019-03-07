@@ -64,7 +64,9 @@ class Controller extends AbstractController
      */
     public function createBadRequestResponse($message = 'Bad Request.')
     {
-        return new Response($message, 400);
+        return new Response($message, 400, [
+            'content-type' => 'text/plain',
+        ]);
     }
 
     /**
